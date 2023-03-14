@@ -10,3 +10,8 @@ Unet taken from ANTsPyNet library and code was adapted from scripts used in othe
 The following examples are outputs from the trained network on images not seen during training.
 
 ![Screenshot](segmentation1.png)
+![Screenshot](segmentation2.png)
+
+The following is an overview of the pipeline I made
+
+![Screenshot](dataPipeline.png)
