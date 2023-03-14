@@ -8,3 +8,5 @@ Training data was taken from manual segmentations made using ImageJ.
 Unet taken from ANTsPyNet library and code was adapted from scripts used in other projects
 
 The following examples are outputs from the trained network on images not seen during training.
+
+![Screenshot](segmentation1.png)
