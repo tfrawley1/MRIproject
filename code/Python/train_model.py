@@ -26,7 +26,7 @@ scripts_directory = base_directory + 'Scripts/'
 
 from batch_generator import batch_generator
 
-template_size = (256, 192)
+template_size = (256, 256)
 classes = (0, 1)
 
 ################################################
@@ -41,11 +41,11 @@ channel_size = len(image_modalities)
 
 unet_model = antspynet.create_unet_model_2d((*template_size, channel_size),
    number_of_outputs=1, mode="sigmoid", number_of_filters=(64, 96, 128, 256, 512),
-   convolution_kernel_size=(3, 3), deconvolution_kernel_size=(2, 2),
-   dropout_rate=0.0, weight_decay=0, 
-   additional_options=("initialConvolutionKernelSize[5]", "attentionGating"))
+    convolution_kernel_size=(3, 3), deconvolution_kernel_size=(2, 2),
+    dropout_rate=0.0, weight_decay=0, 
+    additional_options=("initialConvolutionKernelSize[5]", "attentionGating"))
 
-weights_filename = scripts_directory + "weibinWeights.h5"
+weights_filename = scripts_directory + "231Weights.h5"
 if os.path.exists(weights_filename):
     unet_model.load_weights(weights_filename)
 
@@ -53,21 +53,7 @@ if os.path.exists(weights_filename):
 
 unet_loss = antspynet.binary_dice_coefficient(smoothing_factor=0.)
 
-# unet_loss = antspynet.binary_dice_coefficient(smoothing_factor=0.)
-# unet_loss = keras.losses.BinaryCrossentropy(from_logits=False)
-
-# unet_loss = antspynet.multilabel_surface_loss(dimensionality=2)
-# unet_loss = antspynet.multilabel_dice_coefficient(dimensionality=2, smoothing_factor=0.)
-# surface_loss = antspynet.multilabel_surface_loss(dimensionality=2)
-
-# def combined_loss(alpha):
-#     def combined_loss_fixed(y_true, y_pred):
-#         return (alpha * dice_loss(y_true, y_pred) +
-#                 (1 - alpha) * surface_loss(y_true, y_pred))
-#     return(combined_loss_fixed)
-# wmh_loss = combined_loss(0.5)
-
-unet_model.compile(optimizer=keras.optimizers.Adam(lr=2e-4),
+unet_model.compile(optimizer=keras.optimizers.Adam(lr=1e-4),
                    loss=unet_loss,
                    metrics=[unet_loss])
 
@@ -80,23 +66,21 @@ unet_model.compile(optimizer=keras.optimizers.Adam(lr=2e-4),
 
 print("Loading hist data.")
 
-img_hist_files = glob.glob(base_directory + "Images/*.nii.gz")
-seg_hist_files = glob.glob(base_directory + "Segmentations/*.nii.gz")
+hist_files = glob.glob(base_directory + "Images/*.nii.gz")
 
 training_hist_files = list()
 training_seg_files = list()
 
 count = 0
-for i in range(len(img_hist_files)):
-    # id = (os.path.basename(hist_files[i])).replace(".nii.gz", "")
-    # id = id.replace(".nii.gz", "")
-    # seg_files = glob.glob(base_directory + "Nifti/Resampled/GoodImages_Segmented_Retrain/" + id + "*.nii.gz")
+for i in range(len(hist_files)):
+    id = (os.path.basename(hist_files[i])).replace("_slice_", "_mask_")
+    seg_files = glob.glob(base_directory + "Segmentations/" + id)
 
-    # if len(seg_files) == 0:
-    #     continue
+    if len(seg_files) == 0:
+        continue
 
-    training_hist_files.append(img_hist_files[i])
-    training_seg_files.append(seg_hist_files[i])
+    training_hist_files.append(hist_files[i])
+    training_seg_files.append(seg_files[0])
     count = count + 1
     if count >= 1000:
         break
@@ -110,7 +94,7 @@ print( "Training")
 # Set up the training generator
 #
 
-batch_size = 16 
+batch_size = 32 
 
 # Split trainingData into "training" and "validation" componets for
 # training the model.
@@ -142,7 +126,7 @@ generator = batch_generator(batch_size=batch_size,
                              segmentation_labels=classes,
                              do_random_contralateral_flips=True,
                              do_histogram_intensity_warping=True,
-                             do_simulate_bias_field=True,
+                             do_simulate_bias_field=False,
                              do_add_noise=False
                             )
 
@@ -158,3 +142,4 @@ track = unet_model.fit(x=generator, epochs=200, verbose=1, steps_per_epoch=64,
    )
 
 unet_model.save_weights(weights_filename)
+
