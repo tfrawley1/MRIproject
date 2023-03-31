@@ -49,7 +49,7 @@ for i in range(0,len(predictionImageFiles)):
   predictionImage = ants.image_read( predictionImageFiles[i])
   predictionImage = predictionImage / predictionImage.max()   
   predictionArray = predictionImage.numpy()
-  predicitonArray = (predicitonArray - predicitonArray.min()) / (predicitonArray.max() - predicitonArray.min())
+  predictionArray = (predictionArray - predictionArray.min()) / (predictionArray.max() - predictionArray.min())
   predictionData[i,:,:,0] = predictionArray
 
 X_prediction = predictionData
@@ -60,13 +60,13 @@ unet_model = antspynet.create_unet_model_2d((*template_size, channel_size),
    dropout_rate=0.0, weight_decay=0, 
    additional_options=("initialConvolutionKernelSize[5]", "attentionGating"))
 
-weights_filename = scripts_directory + "weibinWeights.h5"
+weights_filename = scripts_directory + "231Weights.h5"
 if os.path.exists(weights_filename):
     unet_model.load_weights(weights_filename)
 
 unet_loss = antspynet.binary_dice_coefficient(smoothing_factor=0.)
 
-unet_model.compile(optimizer=keras.optimizers.Adam(lr=2e-4),
+unet_model.compile(optimizer=keras.optimizers.Adam(lr=1e-4),
                    loss=unet_loss,
                    metrics=[unet_loss])
 
@@ -77,7 +77,7 @@ for i in range(0,len(predictionImageFiles)):
     imageArray = predictedData[i,:,:,j]  
     image = predictionImage.new_image_like(imageArray)
 
-    imageFileName = predictionImageFiles[i].replace( ".nii.gz", ( "_Probability" + j + ".nii.gz" ))
+    imageFileName = predictionImageFiles[i].replace( ".nii.gz", ( "_Probability" + str(j) + ".nii.gz" ))
     imageFileName = imageFileName.replace(base_directory + "Prediction/", base_directory + "Output/")
     imageFileName = imageFileName.replace( 'Images/', '')
 
