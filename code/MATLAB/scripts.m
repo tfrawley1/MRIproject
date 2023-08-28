@@ -6,10 +6,10 @@ img=double(permute(img,[1 2 5 3 4]));
 %figure;montage(permute(img(40:end-40,40:end-40,:),[1 2 4 3]),'displayrange',[0 30000]);colormap jet;
 % figure;montage(permute(img(:,:,:),[1 2 4 3]),'displayrange',[0 30000]);colormap jet;
 %%
-% img_fil=zeros(size(img));
-% for i=1:size(img,3)
-%     img_fil(:,:,i)=imnlmfilt(img(:,:,i),'DegreeOfSmoothing',600);
-% end
+img_fil=zeros(size(img));
+for i=1:size(img,3)
+    img_fil(:,:,i)=imnlmfilt(img(:,:,i),'DegreeOfSmoothing',600);
+end
 
 % for i=1:size(img,3)
 %     sigma = mean(img(1:10,1:10,i),'all') / sqrt(pi/2);
