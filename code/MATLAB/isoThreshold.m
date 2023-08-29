@@ -1,3 +1,6 @@
+%MATLAB replication of imageJ's automatic threshold algorithm for detecting fat pixels in MRI scan
+%algorithm is isothreshold, less than 1 percent error from value obtained using ImageJ
+
 function T = isoThreshold(img)
     minV = min(img(:));
     maxV = max(img(:));
