@@ -1,3 +1,6 @@
+%Script for cropping and filtering nifti images of mouse abdominal MRI scans
+%images cropped to square 256x256 for data augmentation and U-net
+
 folders = ls('W:\MRI project\C9\*Mo');
 
 for i = 5:length(folders)
@@ -28,6 +31,9 @@ for i = 5:length(folders)
 end
 
 %%
+%script to caculate fat values from U-net mask outputs
+%calculates total fat, total and percent visceral fat, total and percent subcutaneous fat
+%writes out values for each mouse into excel file (will overwrite file with same name)
 folders = ls('W:\MRI project\C9\*old');
 
 for i = 1:1
